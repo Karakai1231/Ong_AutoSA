@@ -1,20 +1,24 @@
-(function(){
+(async function(){
     if(window.location.href !== "https://ongeki-net.com/ongeki-mobile/record/playlog/"){
         alert("このブックマークレットはオンゲキNETのプレイ履歴ページでのみ使用できます。");
         return;
     }
 
-    // 改ざん検出用 MutationObserver
-    let observer = new MutationObserver(() => {
-        alert("ページの内容が変更されました。改ざんが検出されました！\nページをリロードします。");
-        location.reload();
-    });
+    try {
+        // オリジナルのHTMLを再取得（開発者ツールでの改ざんを無視）
+        let res = await fetch(window.location.href, { credentials: "include" });
+        let html = await res.text();
+        let parser = new DOMParser();
+        let doc = parser.parseFromString(html, "text/html");
 
-    observer.observe(document.body, { childList: true, subtree: true });
+        extractData(doc); // 取得したオリジナルHTMLからデータを抽出
+    } catch (err) {
+        alert("元データの取得に失敗しました。ページのリロードを試してください。");
+        console.error(err);
+    }
+})();
 
-    console.log("改ざん検出システムが有効です");
-
-    // 難易度アイコンのマッピング
+function extractData(doc) {
     let d = {
         "diff_basic.png": "BASIC",
         "diff_advanced.png": "ADVANCED",
@@ -25,7 +29,7 @@
 
     let r = [], skipped = 0;
 
-    document.querySelectorAll('.m_10').forEach(e => {
+    doc.querySelectorAll('.m_10').forEach(e => {
         let t = e.querySelector('.f_r.f_12.h_10')?.textContent.trim() || "UNKNOWN_TIME";
         let n = e.querySelector('.m_5.l_h_10.break')?.textContent.trim() || "UNKNOWN_TITLE";
         let i = e.querySelector('img[src*="diff_"]')?.getAttribute("src")?.split("/").pop();
@@ -47,4 +51,4 @@
         console.error("コピー失敗", e);
         alert("コピー失敗");
     });
-})();
+}
