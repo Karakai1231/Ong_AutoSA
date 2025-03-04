@@ -6,10 +6,10 @@
 
     // GoogleフォームのエントリーIDを設定
     const formUrl = "https://docs.google.com/forms/d/e/XXXXXXXXXXXXXX/formResponse"; // フォームURL（自分のに置き換えて）
-    const entryTime = "entry.1234567890"; // プレイ日時のエントリーID
-    const entryTitle = "entry.0987654321"; // 曲名のエントリーID
-    const entryDiff = "entry.1122334455"; // 難易度のエントリーID
-    const entryScore = "entry.5544332211"; // スコアのエントリーID
+    const entryTime = "entry.789034398"; // プレイ日時のエントリーID
+    const entryTitle = "entry.1854790677"; // 曲名のエントリーID
+    const entryDiff = "entry.1367180016"; // 難易度のエントリーID
+    const entryScore = "entry.1093799627"; // スコアのエントリーID
 
     let d = {
         "diff_basic.png": "BASIC",
