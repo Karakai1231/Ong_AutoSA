@@ -5,7 +5,7 @@
     }
 
     // GoogleフォームのエントリーIDを設定
-    const formUrl = "https://docs.google.com/forms/d/e/XXXXXXXXXXXXXX/formResponse"; // フォームURL（自分のに置き換えて）
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSf9f8JF2wCGCCiRhVzFtrYrFQtKM4WnguaAbJjVjqa_5z3xRQ/viewform?usp=dialog"; // フォームURL
     const entryTime = "entry.789034398"; // プレイ日時のエントリーID
     const entryTitle = "entry.1854790677"; // 曲名のエントリーID
     const entryDiff = "entry.1367180016"; // 難易度のエントリーID
