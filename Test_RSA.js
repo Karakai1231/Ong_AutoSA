@@ -7,16 +7,16 @@
     // 🔹 公開鍵を取得（GitHub Pagesなどから）
     const publicKeyPem = await fetch("https://plana1231.github.io/Ong_AutoSA/public.pem").then(res => res.text());
 
-    // 🔹 公開鍵をインポート（修正後）
+    // 🔹 公開鍵をインポート
     async function importPublicKey(pem) {
         const pemHeader = "-----BEGIN PUBLIC KEY-----";
         const pemFooter = "-----END PUBLIC KEY-----";
-        const pemContents = pem.replace(pemHeader, "").replace(pemFooter, "").replace(/\s+/g, ""); // 改行削除
+        const pemContents = pem.replace(pemHeader, "").replace(pemFooter, "").replace(/\s+/g, "");
         const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
 
         return await window.crypto.subtle.importKey(
             "spki",
-            binaryDer.buffer, // `buffer` にする
+            binaryDer.buffer,
             { name: "RSA-OAEP", hash: "SHA-256" },
             true,
             ["encrypt"]
@@ -50,18 +50,52 @@
 
     let rawData = r.join("\n");
 
-    // 🔹 RSA暗号化（修正後）
-    async function encryptData(data, key) {
+    // 🔹 AES-256の鍵とIVを生成
+    async function generateAESKey() {
+        return await window.crypto.subtle.generateKey(
+            { name: "AES-GCM", length: 256 },
+            true,
+            ["encrypt", "decrypt"]
+        );
+    }
+
+    const aesKey = await generateAESKey();
+    const iv = window.crypto.getRandomValues(new Uint8Array(12)); // 12バイトのIV
+
+    // 🔹 AES-GCMでスコア履歴を暗号化
+    async function encryptAES(data, key, iv) {
+        const encodedData = new TextEncoder().encode(data);
+        const encrypted = await window.crypto.subtle.encrypt(
+            { name: "AES-GCM", iv: iv },
+            key,
+            encodedData
+        );
+        return btoa(String.fromCharCode(...new Uint8Array(encrypted))); // Base64変換
+    }
+
+    const encryptedData = await encryptAES(rawData, aesKey, iv);
+
+    // 🔹 AES鍵をエクスポート（ArrayBuffer → Base64）
+    async function exportAESKey(key) {
+        const rawKey = await window.crypto.subtle.exportKey("raw", key);
+        return btoa(String.fromCharCode(...new Uint8Array(rawKey)));
+    }
+
+    const aesKeyBase64 = await exportAESKey(aesKey);
+
+    // 🔹 AES鍵をRSA公開鍵で暗号化
+    async function encryptRSA(data, key) {
         const encodedData = new TextEncoder().encode(data);
         const encrypted = await window.crypto.subtle.encrypt({ name: "RSA-OAEP" }, key, encodedData);
         return btoa(String.fromCharCode(...new Uint8Array(encrypted))); // Base64変換
     }
 
-    const encryptedData = await encryptData(rawData, publicKey);
+    const encryptedAESKey = await encryptRSA(aesKeyBase64, publicKey);
 
     // 🔹 クリップボードにコピー
-    navigator.clipboard.writeText(encryptedData).then(() => {
-        alert("プレイ履歴（RSA暗号化済み）をクリップボードにコピーしました！");
+    const output = `AES_KEY:${encryptedAESKey}\nIV:${btoa(String.fromCharCode(...iv))}\nDATA:${encryptedData}`;
+    navigator.clipboard.writeText(output).then(() => {
+        alert("プレイ履歴（ハイブリッド暗号化済み）をクリップボードにコピーしました！");
     }).catch(e => {
         console.error("コピー失敗", e);
         alert("コピー失敗");
