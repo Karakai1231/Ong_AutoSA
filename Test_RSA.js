@@ -7,21 +7,25 @@
     // 🔹 公開鍵を取得（GitHub Pagesなどから）
     const publicKeyPem = await fetch("https://plana1231.github.io/Ong_AutoSA/public.pem").then(res => res.text());
 
-    // 🔹 公開鍵をインポート
+    // 🔹 公開鍵をインポート（修正後）
     async function importPublicKey(pem) {
-        const binaryDer = Uint8Array.from(atob(pem.replace(/-----(BEGIN|END) PUBLIC KEY-----/g, "").trim()), c => c.charCodeAt(0));
-        return window.crypto.subtle.importKey(
+        const pemHeader = "-----BEGIN PUBLIC KEY-----";
+        const pemFooter = "-----END PUBLIC KEY-----";
+        const pemContents = pem.replace(pemHeader, "").replace(pemFooter, "").replace(/\s+/g, ""); // 改行削除
+        const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+
+        return await window.crypto.subtle.importKey(
             "spki",
-            binaryDer,
+            binaryDer.buffer, // `buffer` にする
             { name: "RSA-OAEP", hash: "SHA-256" },
-            false,
+            true,
             ["encrypt"]
         );
     }
 
     const publicKey = await importPublicKey(publicKeyPem);
 
-    // 🔹 スコアデータを取得
+    // 🔹 スコアデータの取得
     let d = {
         "diff_basic.png": "BASIC",
         "diff_advanced.png": "ADVANCED",
@@ -45,8 +49,8 @@
     });
 
     let rawData = r.join("\n");
-    
-    // 🔹 RSA暗号化
+
+    // 🔹 RSA暗号化（修正後）
     async function encryptData(data, key) {
         const encodedData = new TextEncoder().encode(data);
         const encrypted = await window.crypto.subtle.encrypt({ name: "RSA-OAEP" }, key, encodedData);
@@ -57,7 +61,7 @@
 
     // 🔹 クリップボードにコピー
     navigator.clipboard.writeText(encryptedData).then(() => {
-        alert("データをクリップボードにコピーしました！");
+        alert("プレイ履歴（RSA暗号化済み）をクリップボードにコピーしました！");
     }).catch(e => {
         console.error("コピー失敗", e);
         alert("コピー失敗");
