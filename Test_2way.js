@@ -45,10 +45,10 @@ async function processData(doc) {
                 e.querySelector('.technical_score_block_new .f_20')?.textContent.trim() || 
                 "UNKNOWN_SCORE";
 
-        r.push(`${t}\t${n}\t${l}\t${s}`); // ✅ タブ区切りに変更
+        r.push(`${t} \\ ${n} \\ ${l} \\ ${s}`); // ✅ `\` 区切りで1行にまとめる
     });
 
-    let scoreData = r.join("\n");
+    let scoreData = r.join(" \\ "); // ✅ 各プレイデータを `\` で区切る
 
     // ✅ **Googleフォーム①（スコアデータ送信用）**
     const formUrl1 = "https://docs.google.com/forms/d/e/1FAIpQLSf9f8JF2wCGCCiRhVzFtrYrFQtKM4WnguaAbJjVjqa_5z3xRQ/formResponse";  
