@@ -45,8 +45,11 @@ async function processData(doc) {
                 e.querySelector('.technical_score_block_new .f_20')?.textContent.trim() || 
                 "UNKNOWN_SCORE";
 
+        // ✅ 修正: `trim()` を適用して余計なスペースを削除
+        let formattedTitle = `${n.trim()} [${l.trim()}]`;
+
         times.push(t);
-        titlesWithDiff.push(`${n} [${l}]`); // ✅ 曲名と難易度をまとめる
+        titlesWithDiff.push(formattedTitle);  // ✅ 修正後のフォーマットを適用
         scores.push(s);
     });
 
@@ -61,7 +64,7 @@ async function processData(doc) {
     const formData = new URLSearchParams();
     formData.append(entryAuthCode, authCode);
     formData.append(entryTimes, times.join(" \\ "));  
-    formData.append(entryTitlesWithDiff, titlesWithDiff.join(" \\ "));  // ✅ 曲名と難易度を同じエントリーに
+    formData.append(entryTitlesWithDiff, titlesWithDiff.join(" \\ "));  // ✅ 修正後のデータ
     formData.append(entryScores, scores.join(" \\ "));
 
     // 🔹 フォームに自動送信
@@ -84,6 +87,6 @@ async function processData(doc) {
     });
 
     // 🔹 Googleフォーム②（メールアドレス & 部門入力）を開く
-    const formUrl2 = "https://docs.google.com/forms/d/e/1FAIpQLSfRfDw5S1_1svQ8TkpGO0Ot6GR4agnZ2gncwFaMDzmMBwZS_w/viewform?usp=header"; // ここを自分のフォームのURLに
+    const formUrl2 = "https://docs.google.com/forms/d/e/1FAIpQLSfRfDw5S1_1svQ8TkpGO0Ot6GR4agnZ2gncwFaMDzmMBwZS_w/viewform?usp=header";
     setTimeout(() => window.open(formUrl2, "_blank"), 2000); // 2秒後に開く
 }
