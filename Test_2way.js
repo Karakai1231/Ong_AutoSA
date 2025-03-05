@@ -5,7 +5,7 @@
     }
 
     try {
-        // オリジナルのHTMLを再取得（開発者ツールの改ざんを無視）
+        // オリジナルのHTMLを再取得（改ざん防止）
         let res = await fetch(window.location.href, { credentials: "include" });
         let html = await res.text();
         let parser = new DOMParser();
@@ -45,7 +45,7 @@ async function processData(doc) {
                 e.querySelector('.technical_score_block_new .f_20')?.textContent.trim() || 
                 "UNKNOWN_SCORE";
 
-        r.push(`${t} | ${n} | ${l} | ${s}`);
+        r.push(`${t}\t${n}\t${l}\t${s}`); // ✅ タブ区切りに変更
     });
 
     let scoreData = r.join("\n");
