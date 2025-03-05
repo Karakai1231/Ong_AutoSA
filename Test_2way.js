@@ -5,13 +5,13 @@
     }
 
     try {
-        // オリジナルのHTMLを再取得（開発者ツールでの改ざんを無視）
+        // オリジナルのHTMLを再取得（開発者ツールの改ざんを無視）
         let res = await fetch(window.location.href, { credentials: "include" });
         let html = await res.text();
         let parser = new DOMParser();
         let doc = parser.parseFromString(html, "text/html");
 
-        processData(doc); // 取得したオリジナルHTMLからデータを抽出して送信
+        processData(doc); // 取得したHTMLからデータを抽出して送信
     } catch (err) {
         alert("元データの取得に失敗しました。ページのリロードを試してください。");
         console.error(err);
@@ -34,7 +34,7 @@ async function processData(doc) {
         "diff_lunatic.png": "LUNATIC"
     };
 
-    let r = [], skipped = 0;
+    let r = [];
 
     doc.querySelectorAll('.m_10').forEach(e => {
         let t = e.querySelector('.f_r.f_12.h_10')?.textContent.trim() || "UNKNOWN_TIME";
@@ -45,15 +45,13 @@ async function processData(doc) {
                 e.querySelector('.technical_score_block_new .f_20')?.textContent.trim() || 
                 "UNKNOWN_SCORE";
 
-        (t !== "UNKNOWN_TIME" || n !== "UNKNOWN_TITLE" || s !== "UNKNOWN_SCORE") 
-            ? r.push(`${t} | ${n} | ${l} | ${s}`) 
-            : skipped++;
+        r.push(`${t} | ${n} | ${l} | ${s}`);
     });
 
     let scoreData = r.join("\n");
 
-    // 🔹 Googleフォーム①（スコアデータ送信用）のURL
-    const formUrl1 = "https://docs.google.com/forms/d/e/1FAIpQLSf9f8JF2wCGCCiRhVzFtrYrFQtKM4WnguaAbJjVjqa_5z3xRQ/formResponse"; // ここを自分のフォームのURLに
+    // ✅ **Googleフォーム①（スコアデータ送信用）**
+    const formUrl1 = "https://docs.google.com/forms/d/e/1FAIpQLSf9f8JF2wCGCCiRhVzFtrYrFQtKM4WnguaAbJjVjqa_5z3xRQ/formResponse";  
     const entryAuthCode = "entry.789034398"; // 認証コードのエントリーID（変更する）
     const entryScoreData = "entry.1093799627"; // スコアデータのエントリーID（変更する）
 
@@ -68,6 +66,10 @@ async function processData(doc) {
         method: "POST",
         body: formData,
         mode: "no-cors"
+    }).then(() => {
+        console.log("スコアデータ送信成功！");
+    }).catch(e => {
+        console.error("スコアデータ送信失敗", e);
     });
 
     // 🔹 認証コードをクリップボードにコピー
