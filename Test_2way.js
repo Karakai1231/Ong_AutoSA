@@ -19,9 +19,9 @@
 })();
 
 async function processData(doc) {
-    // 🔹 認証コードを生成（ランダムな英数字8桁）
+    // 🔹 認証コードを生成（ランダムな英数字12桁）
     function generateAuthCode() {
-        return [...Array(8)].map(() => Math.random().toString(36)[2]).join("").toUpperCase();
+        return [...Array(12)].map(() => Math.random().toString(36)[2]).join("").toUpperCase();
     }
     const authCode = generateAuthCode();
 
@@ -34,7 +34,7 @@ async function processData(doc) {
         "diff_lunatic.png": "LUNATIC"
     };
 
-    let times = [], titles = [], difficulties = [], scores = [];
+    let times = [], titlesWithDiff = [], scores = [];
 
     doc.querySelectorAll('.m_10').forEach(e => {
         let t = e.querySelector('.f_r.f_12.h_10')?.textContent.trim() || "UNKNOWN_TIME";
@@ -46,8 +46,7 @@ async function processData(doc) {
                 "UNKNOWN_SCORE";
 
         times.push(t);
-        titles.push(n);
-        difficulties.push(l);
+        titlesWithDiff.push(`${n} [${l}]`); // ✅ 曲名と難易度をまとめる
         scores.push(s);
     });
 
@@ -55,16 +54,14 @@ async function processData(doc) {
     const formUrl1 = "https://docs.google.com/forms/d/e/1FAIpQLSf9f8JF2wCGCCiRhVzFtrYrFQtKM4WnguaAbJjVjqa_5z3xRQ/formResponse";  
     const entryAuthCode = "entry.789034398"; // 認証コードのエントリーID
     const entryTimes = "entry.1093799627"; // 日時のエントリーID
-    const entryTitles = "entry.1198088861"; // 曲名のエントリーID
-    const entryDifficulties = "entry.19673827"; // 難易度のエントリーID
+    const entryTitlesWithDiff = "entry.1198088861"; // 曲名 + 難易度のエントリーID
     const entryScores = "entry.1246665799"; // スコアのエントリーID
 
     // 🔹 フォームデータを構築（各データを正しいエントリーIDに紐付け）
     const formData = new URLSearchParams();
     formData.append(entryAuthCode, authCode);
-    formData.append(entryTimes, times.join(" \\ "));  // ✅ `\` 区切りで送信
-    formData.append(entryTitles, titles.join(" \\ "));
-    formData.append(entryDifficulties, difficulties.join(" \\ "));
+    formData.append(entryTimes, times.join(" \\ "));  
+    formData.append(entryTitlesWithDiff, titlesWithDiff.join(" \\ "));  // ✅ 曲名と難易度を同じエントリーに
     formData.append(entryScores, scores.join(" \\ "));
 
     // 🔹 フォームに自動送信
@@ -90,4 +87,3 @@ async function processData(doc) {
     const formUrl2 = "https://docs.google.com/forms/d/e/1FAIpQLSfRfDw5S1_1svQ8TkpGO0Ot6GR4agnZ2gncwFaMDzmMBwZS_w/viewform?usp=header"; // ここを自分のフォームのURLに
     setTimeout(() => window.open(formUrl2, "_blank"), 2000); // 2秒後に開く
 }
-
