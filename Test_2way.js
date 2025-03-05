@@ -53,7 +53,7 @@ async function processData(doc) {
     let scoreData = r.join("\n");
 
     // 🔹 Googleフォーム①（スコアデータ送信用）のURL
-    const formUrl1 = "https://docs.google.com/forms/d/e/1FAIpQLSf9f8JF2wCGCCiRhVzFtrYrFQtKM4WnguaAbJjVjqa_5z3xRQ/viewform?usp=header"; // ここを自分のフォームのURLに
+    const formUrl1 = "https://docs.google.com/forms/d/e/1FAIpQLSf9f8JF2wCGCCiRhVzFtrYrFQtKM4WnguaAbJjVjqa_5z3xRQ/formResponse"; // ここを自分のフォームのURLに
     const entryAuthCode = "entry.789034398"; // 認証コードのエントリーID（変更する）
     const entryScoreData = "entry.1093799627"; // スコアデータのエントリーID（変更する）
 
