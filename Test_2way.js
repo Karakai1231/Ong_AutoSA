@@ -59,14 +59,13 @@ async function processData(doc) {
     const entryDifficulties = "entry.19673827"; // 難易度のエントリーID
     const entryScores = "entry.1246665799"; // スコアのエントリーID
 
-    // 🔹 フォームデータを構築
-    const formData = new URLSearchParams({
-        [entryAuthCode]: authCode,
-        [entryTimes]: times.join(" \\ "),  // ✅ `\` 区切りで送信
-        [entryTitles]: titles.join(" \\ "),
-        [entryDifficulties]: difficulties.join(" \\ "),
-        [entryScores]: scores.join(" \\ ")
-    });
+    // 🔹 フォームデータを構築（各データを正しいエントリーIDに紐付け）
+    const formData = new URLSearchParams();
+    formData.append(entryAuthCode, authCode);
+    formData.append(entryTimes, times.join(" \\ "));  // ✅ `\` 区切りで送信
+    formData.append(entryTitles, titles.join(" \\ "));
+    formData.append(entryDifficulties, difficulties.join(" \\ "));
+    formData.append(entryScores, scores.join(" \\ "));
 
     // 🔹 フォームに自動送信
     await fetch(formUrl1, {
@@ -91,3 +90,4 @@ async function processData(doc) {
     const formUrl2 = "https://docs.google.com/forms/d/e/1FAIpQLSfRfDw5S1_1svQ8TkpGO0Ot6GR4agnZ2gncwFaMDzmMBwZS_w/viewform?usp=header"; // ここを自分のフォームのURLに
     setTimeout(() => window.open(formUrl2, "_blank"), 2000); // 2秒後に開く
 }
+
