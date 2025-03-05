@@ -45,13 +45,18 @@ async function processData(doc) {
                 e.querySelector('.technical_score_block_new .f_20')?.textContent.trim() || 
                 "UNKNOWN_SCORE";
 
-        // ✅ 修正: `trim()` を適用して余計なスペースを削除
-        let formattedTitle = `${n.trim()} [${l.trim()}]`;
+        // ✅ 曲名と難易度を `[ ]` の形式にし、余計なスペースを削除
+        let formattedTitle = `${n.trim()} [${l.trim()}]`.replace(/\s+\[/, " ["); // `[ ]` の前後にスペースを入れない
 
         times.push(t);
-        titlesWithDiff.push(formattedTitle);  // ✅ 修正後のフォーマットを適用
+        titlesWithDiff.push(formattedTitle);
         scores.push(s);
     });
+
+    // ✅ **\ の前後の余分なスペースを削除**
+    let cleanedTitles = titlesWithDiff.map(title => title.trim()).join("\\");
+    let cleanedTimes = times.map(time => time.trim()).join("\\");
+    let cleanedScores = scores.map(score => score.trim()).join("\\");
 
     // ✅ **Googleフォーム①（スコアデータ送信用）**
     const formUrl1 = "https://docs.google.com/forms/d/e/1FAIpQLSf9f8JF2wCGCCiRhVzFtrYrFQtKM4WnguaAbJjVjqa_5z3xRQ/formResponse";  
@@ -63,9 +68,9 @@ async function processData(doc) {
     // 🔹 フォームデータを構築（各データを正しいエントリーIDに紐付け）
     const formData = new URLSearchParams();
     formData.append(entryAuthCode, authCode);
-    formData.append(entryTimes, times.join(" \\ "));  
-    formData.append(entryTitlesWithDiff, titlesWithDiff.join(" \\ "));  // ✅ 修正後のデータ
-    formData.append(entryScores, scores.join(" \\ "));
+    formData.append(entryTimes, cleanedTimes);
+    formData.append(entryTitlesWithDiff, cleanedTitles);  // ✅ 余計なスペースを削除したデータ
+    formData.append(entryScores, cleanedScores);
 
     // 🔹 フォームに自動送信
     await fetch(formUrl1, {
