@@ -75,8 +75,39 @@ async function processData(doc) {
         console.error("スコアデータ送信失敗", e);
     });
 
-    // ✅ **認証コードを入力済みのGoogleフォームを開く**
-    const formUrl2 = `https://docs.google.com/forms/d/e/1FAIpQLSfRfDw5S1_1svQ8TkpGO0Ot6GR4agnZ2gncwFaMDzmMBwZS_w/viewform?usp=header&entry.789034398=${authCode}`;
+    // ✅ **iOS対応のクリップボードコピー処理**
+    function copyToClipboard(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`認証コードをコピーしました！\n\n認証コード: ${authCode}\n\n次のフォームで認証コードを入力してください。`);
+            }).catch(err => {
+                fallbackCopyToClipboard(text);
+            });
+        } else {
+            fallbackCopyToClipboard(text);
+        }
+    }
 
+    function fallbackCopyToClipboard(text) {
+        let textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand("copy");
+            alert(`認証コードをコピーしました！\n\n認証コード: ${authCode}\n\n次のフォームで認証コードを入力してください。`);
+        } catch (err) {
+            alert("コピーに失敗しました。認証コードを手動でメモしてください。\n\n認証コード: " + authCode);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    copyToClipboard(authCode);
+
+    // ✅ **Googleフォーム②を開く（自動入力なし）**
+    const formUrl2 = "https://docs.google.com/forms/d/e/1FAIpQLSfRfDw5S1_1svQ8TkpGO0Ot6GR4agnZ2gncwFaMDzmMBwZS_w/viewform?usp=header";
     setTimeout(() => window.open(formUrl2, "_blank"), 2000);
 }
