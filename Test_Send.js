@@ -75,8 +75,8 @@ async function processData(doc) {
         console.error("スコアデータ送信失敗", e);
     });
 
-    // ✅ **認証コードを入力済みのGoogleフォームを開く**
-    const formUrl2 = `https://docs.google.com/forms/d/e/1FAIpQLSfRfDw5S1_1svQ8TkpGO0Ot6GR4agnZ2gncwFaMDzmMBwZS_w/viewform?usp=header&entry.789034398=${authCode}`;
+    alert("スコアを取得しました。\n送信フォームに移動します。");
 
+    const formUrl2 = `https://docs.google.com/forms/d/e/1FAIpQLSfRfDw5S1_1svQ8TkpGO0Ot6GR4agnZ2gncwFaMDzmMBwZS_w/viewform?usp=pp_url&entry.1659678167=${authCode}`;
     setTimeout(() => window.open(formUrl2, "_blank"), 2000);
 }
